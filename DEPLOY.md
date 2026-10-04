@@ -76,6 +76,8 @@ Cole **nessa ordem** o conteúdo de cada arquivo e rode (Run):
 2. `supabase/migrations/20261002140100_gestao_operacional_functions.sql`
 3. `supabase/migrations/20261002140200_gestao_operacional_rls.sql`
 4. `supabase/migrations/20261002140300_gestao_operacional_seed_cities.sql`
+5. `supabase/migrations/20261004030000_provision_coordinator.sql`
+6. `supabase/migrations/20261004120000_presence_links.sql`
 
 ### Auth (Settings → Authentication)
 
@@ -117,6 +119,7 @@ VALUES (
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
+NEXT_PUBLIC_APP_URL=https://SEU-DOMINIO.vercel.app
 NEXT_PUBLIC_MAPS_API_KEY=   # opcional
 ```
 
@@ -153,7 +156,7 @@ Vercel → Project → Deployments → ⋮ → Redeploy
 ## Checklist
 
 - [ ] Código no `saaseleitoral` (main)
-- [ ] 4 migrations aplicadas
+- [ ] Migrations aplicadas (inclui presença)
 - [ ] Master criado (Auth + `op_profiles`)
 - [ ] Env vars na Vercel
 - [ ] Site URL do Supabase apontando para Vercel

@@ -1,6 +1,8 @@
 export type OpUserRole = "master" | "coordinator";
 export type OpPaymentStatus = "pending" | "paid";
 export type OpPixType = "cpf" | "cnpj" | "email" | "telefone" | "aleatoria";
+export type OpPresenceLinkStatus = "pending" | "active" | "expired" | "revoked";
+export type OpPresenceGeoStatus = "inside" | "outside" | "uncertain" | "unknown";
 
 export interface OpProfile {
   id: string;
@@ -130,4 +132,52 @@ export interface SessionUser {
   id: string;
   email: string;
   profile: OpProfile;
+}
+
+export interface OpPresenceLink {
+  id: string;
+  token_hash: string;
+  member_id: string;
+  location_id: string;
+  team_id: string;
+  created_by: string | null;
+  starts_at: string;
+  expires_at: string;
+  revoked_at: string | null;
+  ping_interval_sec: number;
+  otp_hash: string;
+  otp_hint: string | null;
+  status: OpPresenceLinkStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OpPresenceSession {
+  id: string;
+  link_id: string;
+  session_token_hash: string;
+  phone_verified_at: string;
+  consent_at: string;
+  user_agent: string | null;
+  last_ping_at: string | null;
+  last_status: OpPresenceGeoStatus;
+  last_distance_m: number | null;
+  last_accuracy_m: number | null;
+  last_latitude: number | null;
+  last_longitude: number | null;
+  ended_at: string | null;
+  end_reason: string | null;
+  created_at: string;
+}
+
+export interface OpPresencePing {
+  id: string;
+  session_id: string;
+  latitude: number;
+  longitude: number;
+  accuracy_m: number | null;
+  distance_m: number | null;
+  geo_status: OpPresenceGeoStatus;
+  client_ts: string | null;
+  recorded_at: string;
 }

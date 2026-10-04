@@ -5,8 +5,22 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { requireUser, homePathForRole } from "@/lib/auth/session";
-import { coordinatorSchema, memberSchema, locationSchema, assignmentSchema, loginSchema } from "@/lib/validations";
+import {
+  coordinatorSchema,
+  memberSchema,
+  locationSchema,
+  assignmentSchema,
+  loginSchema,
+  createPresenceLinkSchema,
+} from "@/lib/validations";
 import { friendlyError, onlyDigits } from "@/lib/utils";
+import {
+  buildPresenceUrl,
+  generateOtpCode,
+  generatePresenceToken,
+  hashSecret,
+} from "@/lib/presence";
+import { headers } from "next/headers";
 
 type ActionResult<T = unknown> = { ok: true; data?: T } | { ok: false; error: string };
 
@@ -485,6 +499,161 @@ export async function setMemberActiveAction(memberId: string, active: boolean): 
     revalidatePath(`/integrantes/${memberId}`);
     revalidatePath("/dashboard");
     revalidatePath("/pendencias");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: friendlyError(error) };
+  }
+}
+
+async function resolveAppOrigin(): Promise<string> {
+  const fromEnv = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (fromEnv) return fromEnv.replace(/\/$/, "");
+
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const proto = h.get("x-forwarded-proto") ?? "http";
+  if (host) return `${proto}://${host}`;
+  return "http://localhost:3000";
+}
+
+export async function createPresenceLinkAction(
+  input: unknown
+): Promise<ActionResult<{ url: string; otp: string; expires_at: string; id: string }>> {
+  try {
+    const session = await requireUser(["master", "coordinator"]);
+    const data = createPresenceLinkSchema.parse(input);
+    const supabase = await createClient();
+
+    const { data: member, error: memberError } = await supabase
+      .from("op_members")
+      .select("id, team_id, phone, full_name, active")
+      .eq("id", data.member_id)
+      .maybeSingle();
+    if (memberError) throw memberError;
+    if (!member || !member.active) {
+      return { ok: false, error: "Integrante não encontrado ou inativo." };
+    }
+    if (!member.phone || onlyDigits(member.phone).length < 10) {
+      return { ok: false, error: "Integrante sem telefone cadastrado." };
+    }
+
+    const { data: location, error: locationError } = await supabase
+      .from("op_locations")
+      .select("id, name, latitude, longitude, operational_radius, active")
+      .eq("id", data.location_id)
+      .maybeSingle();
+    if (locationError) throw locationError;
+    if (!location || !location.active) {
+      return { ok: false, error: "Local não encontrado ou inativo." };
+    }
+    if (location.latitude == null || location.longitude == null) {
+      return { ok: false, error: "Local sem coordenadas. Cadastre latitude/longitude antes." };
+    }
+
+    const { data: teamLink } = await supabase
+      .from("op_team_locations")
+      .select("id")
+      .eq("team_id", member.team_id)
+      .eq("location_id", data.location_id)
+      .maybeSingle();
+
+    if (!teamLink && session.profile.role === "coordinator") {
+      return { ok: false, error: "Este local não está vinculado à equipe." };
+    }
+
+    const token = generatePresenceToken();
+    const otp = generateOtpCode();
+    const expiresAt = new Date(Date.now() + data.duration_hours * 60 * 60 * 1000).toISOString();
+
+    const { data: profile } = await supabase
+      .from("op_profiles")
+      .select("id")
+      .eq("auth_user_id", session.id)
+      .maybeSingle();
+
+    const { data: link, error } = await supabase
+      .from("op_presence_links")
+      .insert({
+        token_hash: hashSecret(token),
+        member_id: member.id,
+        location_id: location.id,
+        team_id: member.team_id,
+        created_by: profile?.id ?? null,
+        expires_at: expiresAt,
+        ping_interval_sec: data.ping_interval_sec,
+        otp_hash: hashSecret(otp),
+        otp_hint: otp.slice(-2),
+        status: "pending",
+      })
+      .select("id, expires_at")
+      .single();
+
+    if (error) return { ok: false, error: friendlyError(error) };
+
+    await writeAudit("PRESENCE_LINK_CREATED", "presence_link", link.id, {
+      member_id: member.id,
+      location_id: location.id,
+      expires_at: expiresAt,
+      duration_hours: data.duration_hours,
+    });
+
+    const origin = await resolveAppOrigin();
+    revalidatePath("/presenca");
+    revalidatePath(`/integrantes/${member.id}`);
+
+    return {
+      ok: true,
+      data: {
+        id: link.id,
+        url: buildPresenceUrl(origin, token),
+        otp,
+        expires_at: link.expires_at,
+      },
+    };
+  } catch (error) {
+    return { ok: false, error: friendlyError(error) };
+  }
+}
+
+export async function revokePresenceLinkAction(linkId: string): Promise<ActionResult> {
+  try {
+    await requireUser(["master", "coordinator"]);
+    const supabase = await createClient();
+
+    const { data: link, error: linkError } = await supabase
+      .from("op_presence_links")
+      .select("id, status")
+      .eq("id", linkId)
+      .maybeSingle();
+    if (linkError) throw linkError;
+    if (!link) return { ok: false, error: "Link não encontrado." };
+
+    const { error } = await supabase
+      .from("op_presence_links")
+      .update({
+        status: "revoked",
+        revoked_at: new Date().toISOString(),
+      })
+      .eq("id", linkId);
+
+    if (error) return { ok: false, error: friendlyError(error) };
+
+    try {
+      const admin = createServiceClient();
+      await admin
+        .from("op_presence_sessions")
+        .update({
+          ended_at: new Date().toISOString(),
+          end_reason: "revoked",
+        })
+        .eq("link_id", linkId)
+        .is("ended_at", null);
+    } catch {
+      // Link já foi revogado; encerrar sessões é best-effort.
+    }
+
+    await writeAudit("PRESENCE_LINK_REVOKED", "presence_link", linkId, {});
+    revalidatePath("/presenca");
     return { ok: true };
   } catch (error) {
     return { ok: false, error: friendlyError(error) };
