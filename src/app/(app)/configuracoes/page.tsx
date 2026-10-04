@@ -9,7 +9,7 @@ export default async function SettingsPage() {
   return (
     <div>
       <TopBar title={session.profile.role === "master" ? "Configurações" : "Minha conta"} />
-      <div className="rounded-xl border bg-card p-6 shadow-sm">
+      <div className="rounded-xl border bg-card p-4 shadow-sm sm:p-6">
         <dl className="grid gap-4 sm:grid-cols-2">
           <div>
             <dt className="text-xs uppercase text-muted-foreground">Nome</dt>

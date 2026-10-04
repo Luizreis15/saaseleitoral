@@ -77,7 +77,7 @@ export default async function MemberDetailPage({
         }
       />
 
-      <div className="grid gap-4 rounded-xl border bg-card p-6 shadow-sm sm:grid-cols-2">
+      <div className="grid gap-4 rounded-xl border bg-card p-4 shadow-sm sm:grid-cols-2 sm:p-6">
         <div>
           <p className="text-xs uppercase text-muted-foreground">CPF</p>
           <p className="font-medium">{maskCpf(member.cpf)}</p>

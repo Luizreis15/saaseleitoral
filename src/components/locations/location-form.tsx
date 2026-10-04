@@ -120,7 +120,7 @@ export function LocationForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4 rounded-xl border bg-card p-6 shadow-sm">
+    <form onSubmit={onSubmit} className="space-y-4 rounded-xl border bg-card p-4 shadow-sm sm:p-6">
       {canSearch ? (
         <div className="space-y-2">
           <Label>Buscar escola no mapa</Label>

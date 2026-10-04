@@ -84,7 +84,7 @@ export function MemberForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-8">
-      <section className="space-y-4 rounded-xl border bg-card p-6 shadow-sm">
+      <section className="space-y-4 rounded-xl border bg-card p-4 shadow-sm sm:p-6">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Identificação</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2 sm:col-span-2">
@@ -110,7 +110,7 @@ export function MemberForm({
         </div>
       </section>
 
-      <section className="space-y-4 rounded-xl border bg-card p-6 shadow-sm">
+      <section className="space-y-4 rounded-xl border bg-card p-4 shadow-sm sm:p-6">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Localidade</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2 sm:col-span-2">
@@ -147,7 +147,7 @@ export function MemberForm({
         </div>
       </section>
 
-      <section className="space-y-4 rounded-xl border bg-card p-6 shadow-sm">
+      <section className="space-y-4 rounded-xl border bg-card p-4 shadow-sm sm:p-6">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Pagamento</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
@@ -172,7 +172,7 @@ export function MemberForm({
         </div>
       </section>
 
-      <section className="space-y-4 rounded-xl border bg-card p-6 shadow-sm">
+      <section className="space-y-4 rounded-xl border bg-card p-4 shadow-sm sm:p-6">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Operação</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">

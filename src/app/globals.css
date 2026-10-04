@@ -72,6 +72,24 @@ body {
   overflow-x: clip;
 }
 
+.app-shell {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.app-gutter {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+@media (min-width: 768px) {
+  main.app-gutter {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
 @media (max-width: 767px) {
   .data-list {
     overflow: visible;
@@ -87,6 +105,7 @@ body {
     display: block;
     width: 100%;
     min-width: 0;
+    max-width: 100%;
   }
 
   .data-list thead {
@@ -95,29 +114,28 @@ body {
 
   .data-list tr {
     margin-bottom: 0.75rem;
+    overflow: hidden;
     border: 1px solid var(--border);
-    border-radius: 0.875rem;
+    border-radius: 1rem;
     background: white;
-    padding: 0.25rem 0;
+    padding: 0.35rem 0;
   }
 
   .data-list td {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.55rem 0.875rem;
-    text-align: right;
+    padding: 0.55rem 1rem;
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   .data-list td::before {
     content: attr(data-label);
-    flex: 0 0 auto;
+    display: block;
+    margin-bottom: 0.15rem;
     color: var(--muted-foreground);
     font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.04em;
-    text-align: left;
     text-transform: uppercase;
   }
 }
