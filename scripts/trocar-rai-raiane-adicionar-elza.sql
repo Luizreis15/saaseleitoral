@@ -23,18 +23,17 @@ BEGIN
       full_name ILIKE 'Raí%'
       OR full_name ILIKE 'Rai %'
       OR full_name ILIKE 'Rai'
-      OR unaccent(lower(full_name)) LIKE 'rai%'
+      OR lower(full_name) LIKE 'rai %'
+      OR lower(full_name) = 'rai'
     )
+    AND full_name NOT ILIKE 'Raiane%'
   ORDER BY created_at
   LIMIT 1;
 
   SELECT * INTO raiane
   FROM public.op_members
   WHERE active = TRUE
-    AND (
-      full_name ILIKE 'Raiane%'
-      OR unaccent(lower(full_name)) LIKE 'raiane%'
-    )
+    AND full_name ILIKE 'Raiane%'
   ORDER BY created_at
   LIMIT 1;
 
