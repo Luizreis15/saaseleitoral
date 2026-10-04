@@ -83,6 +83,13 @@ export function friendlyError(error: unknown): string {
     return "Você não possui permissão para esta operação.";
   }
   if (lower.includes("já está confirmado")) return "Este pagamento já foi confirmado.";
+  if (
+    lower.includes("already registered") ||
+    lower.includes("already been registered") ||
+    lower.includes("already exists")
+  ) {
+    return "Este e-mail já está cadastrado. Envie o formulário outra vez para concluir o cadastro, se ele tiver ficado incompleto.";
+  }
   if (message.length > 180 || lower.includes("postgres") || lower.includes("stack")) {
     return "Não foi possível concluir a operação. Tente novamente ou fale com o administrador.";
   }

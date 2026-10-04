@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { TopBar } from "@/components/layout/top-bar";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/dashboard/empty-state";
-import { formatCurrency, maskCpf } from "@/lib/utils";
+import { formatCurrency, friendlyError, maskCpf } from "@/lib/utils";
 import { getSessionUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 
@@ -12,7 +12,7 @@ export default async function CoordinatorsPage() {
   if (!session || session.profile.role !== "master") redirect("/minha-equipe");
 
   const supabase = await createClient();
-  const { data: coordinators } = await supabase
+  const { data: coordinators, error: coordinatorsError } = await supabase
     .from("op_coordinators")
     .select("id, full_name, phone, cpf, active, op_teams(id, name, default_payment_amount)")
     .order("full_name");
@@ -78,7 +78,12 @@ export default async function CoordinatorsPage() {
         }
       />
 
-      {!rows.length ? (
+      {coordinatorsError ? (
+        <EmptyState
+          title="Não foi possível carregar os coordenadores"
+          description={friendlyError(coordinatorsError.message)}
+        />
+      ) : !rows.length ? (
         <EmptyState
           title="Nenhum coordenador cadastrado"
           description="Cadastre o primeiro coordenador para iniciar a operação."

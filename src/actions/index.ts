@@ -69,76 +69,105 @@ export async function logoutAction() {
   redirect("/login");
 }
 
+function isAlreadyRegistered(message: string | undefined): boolean {
+  const lower = (message ?? "").toLowerCase();
+  return lower.includes("already registered") || lower.includes("already been registered") || lower.includes("already exists");
+}
+
 export async function createCoordinatorAction(input: unknown): Promise<ActionResult<{ id: string }>> {
+  let createdAuthUserId: string | null = null;
   try {
     await requireUser(["master"]);
     const data = coordinatorSchema.parse(input);
     const admin = createServiceClient();
+    const email = data.email.trim().toLowerCase();
 
-    const { data: authData, error: authError } = await admin.auth.admin.createUser({
-      email: data.email,
+    const { data: existingProfile, error: existingProfileError } = await admin
+      .from("op_profiles")
+      .select("id, auth_user_id, role")
+      .ilike("email", email.replace(/[%_]/g, "\\$&"))
+      .maybeSingle();
+    if (existingProfileError) throw existingProfileError;
+
+    if (existingProfile && existingProfile.role !== "coordinator") {
+      return { ok: false, error: "Este e-mail já está em uso." };
+    }
+
+    if (existingProfile) {
+      const { data: existingCoordinator, error: existingCoordinatorError } = await admin
+        .from("op_coordinators")
+        .select("id, op_teams(id)")
+        .eq("profile_id", existingProfile.id)
+        .maybeSingle();
+      if (existingCoordinatorError) throw existingCoordinatorError;
+
+      const team = Array.isArray(existingCoordinator?.op_teams)
+        ? existingCoordinator.op_teams[0]
+        : existingCoordinator?.op_teams;
+      if (existingCoordinator && team) {
+        return { ok: false, error: "Este e-mail já está cadastrado como coordenador." };
+      }
+    }
+
+    let authUserId = existingProfile?.auth_user_id ?? null;
+
+    if (!authUserId) {
+      const { data: authData, error: authError } = await admin.auth.admin.createUser({
+        email,
+        password: data.temporary_password,
+        email_confirm: true,
+        user_metadata: { full_name: data.full_name, role: "coordinator" },
+      });
+
+      if (authError || !authData.user) {
+        if (!isAlreadyRegistered(authError?.message)) {
+          return { ok: false, error: friendlyError(authError?.message ?? "Falha ao criar usuário") };
+        }
+        const { data: foundId, error: foundError } = await admin.rpc("op_auth_user_id_by_email", {
+          p_email: email,
+        });
+        if (foundError || !foundId) {
+          return { ok: false, error: friendlyError(authError?.message ?? "Falha ao criar usuário") };
+        }
+        authUserId = foundId;
+      } else {
+        authUserId = authData.user.id;
+        createdAuthUserId = authUserId;
+      }
+    }
+
+    const { error: passwordError } = await admin.auth.admin.updateUserById(authUserId, {
       password: data.temporary_password,
       email_confirm: true,
       user_metadata: { full_name: data.full_name, role: "coordinator" },
     });
+    if (passwordError) throw passwordError;
 
-    if (authError || !authData.user) {
-      return { ok: false, error: friendlyError(authError?.message ?? "Falha ao criar usuário") };
+    const { data: coordinatorId, error: provisionError } = await admin.rpc("op_provision_coordinator", {
+      p_auth_user_id: authUserId,
+      p_full_name: data.full_name,
+      p_email: email,
+      p_phone: onlyDigits(data.phone),
+      p_whatsapp: data.whatsapp ? onlyDigits(data.whatsapp) : null,
+      p_cpf: onlyDigits(data.cpf),
+      p_active: data.active,
+      p_team_name: data.team_name,
+      p_default_payment_amount: data.default_payment_amount,
+    });
+
+    if (provisionError || !coordinatorId) {
+      if (createdAuthUserId) await admin.auth.admin.deleteUser(createdAuthUserId);
+      throw provisionError ?? new Error("Falha ao concluir o cadastro do coordenador.");
     }
 
-    const authUserId = authData.user.id;
+    await writeAudit("COORDINATOR_CREATED", "coordinator", coordinatorId, {
+      email,
+      team_name: data.team_name,
+    });
 
-    try {
-      const { data: profile, error: profileError } = await admin
-        .from("op_profiles")
-        .insert({
-          auth_user_id: authUserId,
-          full_name: data.full_name,
-          email: data.email,
-          role: "coordinator",
-          active: data.active,
-        })
-        .select("id")
-        .single();
-
-      if (profileError || !profile) throw profileError;
-
-      const { data: coordinator, error: coordError } = await admin
-        .from("op_coordinators")
-        .insert({
-          profile_id: profile.id,
-          full_name: data.full_name,
-          phone: onlyDigits(data.phone),
-          whatsapp: data.whatsapp ? onlyDigits(data.whatsapp) : null,
-          cpf: onlyDigits(data.cpf),
-          active: data.active,
-        })
-        .select("id")
-        .single();
-
-      if (coordError || !coordinator) throw coordError;
-
-      const { error: teamError } = await admin.from("op_teams").insert({
-        name: data.team_name,
-        coordinator_id: coordinator.id,
-        default_payment_amount: data.default_payment_amount,
-        active: true,
-      });
-
-      if (teamError) throw teamError;
-
-      await writeAudit("COORDINATOR_CREATED", "coordinator", coordinator.id, {
-        email: data.email,
-        team_name: data.team_name,
-      });
-
-      revalidatePath("/coordenadores");
-      revalidatePath("/dashboard");
-      return { ok: true, data: { id: coordinator.id } };
-    } catch (err) {
-      await admin.auth.admin.deleteUser(authUserId);
-      throw err;
-    }
+    revalidatePath("/coordenadores");
+    revalidatePath("/dashboard");
+    return { ok: true, data: { id: coordinatorId } };
   } catch (error) {
     return { ok: false, error: friendlyError(error) };
   }
