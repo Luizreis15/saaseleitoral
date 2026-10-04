@@ -1,4 +1,4 @@
-# Digital Era — Gestão Operacional de Equipes (V1)
+# Digital Hera — Gestão Operacional de Equipes (V1)
 
 Aplicação web privada para administrar equipes operacionais:
 

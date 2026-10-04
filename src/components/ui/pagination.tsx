@@ -35,19 +35,7 @@ export function Pagination({
         {total === 0 ? "Nenhum registro" : `Mostrando ${start}–${end} de ${total}`}
       </p>
       <div className="flex flex-wrap items-center gap-2">
-        <select
-          className="h-9 rounded-md border border-input bg-background px-2 text-sm"
-          defaultValue={pageSize}
-          onChange={() => undefined}
-          aria-label="Itens por página"
-        >
-          {PAGE_SIZE_OPTIONS.map((size) => (
-            <option key={size} value={size}>
-              {size}/página
-            </option>
-          ))}
-        </select>
-        <div className="flex gap-1">
+        <div className="hidden gap-1 sm:flex">
           {PAGE_SIZE_OPTIONS.map((size) => (
             <Button key={size} asChild size="sm" variant={size === pageSize ? "default" : "outline"}>
               <Link href={href(1, size)}>{size}</Link>

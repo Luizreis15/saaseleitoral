@@ -1,4 +1,4 @@
-# Deploy — Digital Era Gestão Operacional
+# Deploy — Digital Hera Gestão Operacional
 
 Guia para subir o app no **GitHub `saaseleitoral`**, conectar **Supabase** e publicar na **Vercel**.
 
@@ -51,7 +51,7 @@ Depois, no GitHub: abra PR `cursor/gestao-operacional-v1-bf2b` → `main` e faç
 
 1. Acesse https://supabase.com/dashboard  
 2. **New project**
-   - Name: `saaseleitoral` (ou Digital Era)
+   - Name: `saaseleitoral` (ou Digital Hera)
    - Region: **South America (São Paulo)** se disponível, senão a mais próxima
    - Defina uma senha forte do banco (guarde)
 3. Espere o projeto ficar **Ready**
@@ -96,7 +96,7 @@ Cole **nessa ordem** o conteúdo de cada arquivo e rode (Run):
 INSERT INTO public.op_profiles (auth_user_id, full_name, email, role, active)
 VALUES (
   '<COLE-O-UID-AQUI>',
-  'Master Digital Era',
+  'Master Digital Hera',
   'seu-email@exemplo.com',
   'master',
   true

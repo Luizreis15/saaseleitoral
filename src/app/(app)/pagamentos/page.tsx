@@ -52,7 +52,7 @@ export default async function PaymentsPage({
         <select
           name="status"
           defaultValue={sp.status ?? ""}
-          className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+          className="h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-base sm:w-auto"
         >
           <option value="">Todos</option>
           <option value="pending">Pendentes</option>
@@ -63,7 +63,7 @@ export default async function PaymentsPage({
         </button>
       </form>
 
-      <div className="overflow-x-auto rounded-xl border bg-card shadow-sm">
+      <div className="data-list overflow-x-auto rounded-xl border bg-card shadow-sm">
         <table className="min-w-full text-sm">
           <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
@@ -84,17 +84,17 @@ export default async function PaymentsPage({
                 : null;
               return (
                 <tr key={p.id} className="border-t">
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3" data-label="Integrante">
                     <p className="font-medium">{member?.full_name ?? "—"}</p>
                     <p className="text-xs text-muted-foreground">{maskCpf(member?.cpf)}</p>
                   </td>
-                  <td className="px-4 py-3">{team?.name ?? "—"}</td>
-                  <td className="px-4 py-3 tabular-nums">{formatCurrency(p.amount)}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3" data-label="Equipe">{team?.name ?? "—"}</td>
+                  <td className="px-4 py-3 tabular-nums" data-label="Valor">{formatCurrency(p.amount)}</td>
+                  <td className="px-4 py-3" data-label="Status">
                     <PaymentBadge status={p.status} />
                   </td>
                   {isMaster ? (
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3" data-label="Ação">
                       {p.status === "pending" ? (
                         <ConfirmPaymentDialog
                           paymentId={p.id}
