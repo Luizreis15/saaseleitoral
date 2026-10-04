@@ -45,7 +45,7 @@ export function CoordinatorForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6 rounded-xl border bg-card p-6 shadow-sm">
+    <form onSubmit={onSubmit} className="space-y-6 rounded-xl border bg-card p-4 shadow-sm sm:p-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2 sm:col-span-2">
           <Label>Nome completo *</Label>

@@ -10,15 +10,15 @@ export default async function AppShellLayout({ children }: { children: React.Rea
   const showSearch = session.profile.role === "master";
 
   return (
-    <div className="flex min-h-dvh flex-col overflow-x-clip md:flex-row">
+    <div className="app-shell flex min-h-dvh flex-col md:flex-row">
       <AppSidebar role={session.profile.role} fullName={session.profile.full_name} />
-      <div className="flex min-h-dvh min-w-0 flex-1 flex-col">
+      <div className="flex min-h-dvh w-full min-w-0 max-w-full flex-1 flex-col">
         <MobileChrome
           role={session.profile.role}
           fullName={session.profile.full_name}
           showSearch={showSearch}
         />
-        <main className="min-w-0 flex-1 overflow-x-clip px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-4 md:px-8 md:pb-8 md:pt-6">
+        <main className="app-gutter min-w-0 max-w-full flex-1 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-4 md:pb-8 md:pt-6">
           <div className="mx-auto w-full max-w-7xl animate-fade-up">
             {showSearch ? (
               <div className="mb-6 hidden md:block">

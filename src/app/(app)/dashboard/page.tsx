@@ -33,7 +33,7 @@ export default async function DashboardPage() {
         }
       />
 
-      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Coordenadores" value={stats.total_coordinators ?? 0} />
         <StatCard label="Integrantes" value={stats.total_members ?? 0} />
         <StatCard label="Escolas" value={stats.total_locations ?? 0} />
@@ -44,7 +44,7 @@ export default async function DashboardPage() {
         />
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-3 xl:grid-cols-3">
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
         <StatCard label="Custo total" value={formatCurrency(stats.total_cost ?? 0)} />
         <StatCard label="Pagos" value={stats.paid_count ?? 0} tone="success" />
         <StatCard

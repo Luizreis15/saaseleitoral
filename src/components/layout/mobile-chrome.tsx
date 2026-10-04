@@ -85,22 +85,22 @@ export function MobileChrome({
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b bg-white/95 backdrop-blur md:hidden pt-[env(safe-area-inset-top)]">
-        <div className="flex h-14 items-center px-4">
+      <header className="app-gutter sticky top-0 z-40 border-b bg-white/95 pt-[env(safe-area-inset-top)] backdrop-blur md:hidden">
+        <div className="flex h-14 items-center">
           <div className="min-w-0">
             <p className="truncate text-base font-semibold tracking-tight text-primary">Digital Hera</p>
             <p className="truncate text-xs text-muted-foreground">Gestão Operacional</p>
           </div>
         </div>
         {showSearch ? (
-          <div className="px-4 pb-3">
+          <div className="pb-3">
             <GlobalSearchInput />
           </div>
         ) : null}
       </header>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t bg-white/95 backdrop-blur md:hidden pb-[env(safe-area-inset-bottom)]"
+        className="app-gutter fixed inset-x-0 bottom-0 z-40 border-t bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
         aria-label="Navegação principal"
       >
         <div className="grid grid-cols-5">

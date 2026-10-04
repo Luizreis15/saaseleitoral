@@ -25,7 +25,7 @@ export default async function LocationDetailPage({
   return (
     <div>
       <TopBar title={location.name} description="Detalhe do local operacional" />
-      <div className="grid gap-4 rounded-xl border bg-card p-6 shadow-sm sm:grid-cols-2">
+      <div className="grid gap-4 rounded-xl border bg-card p-4 shadow-sm sm:grid-cols-2 sm:p-6">
         <div>
           <p className="text-xs uppercase text-muted-foreground">Cidade</p>
           <p>{city?.name ?? "—"}</p>

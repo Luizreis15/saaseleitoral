@@ -75,7 +75,7 @@ export default async function CoordinatorDetailPage({
         <span>{maskCpf(coordinator.cpf)}</span>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Equipe" value={team?.name ?? "—"} />
         <StatCard label="Pessoas" value={members?.length ?? 0} />
         <StatCard label="Valor por integrante" value={formatCurrency(team?.default_payment_amount ?? 0)} />
