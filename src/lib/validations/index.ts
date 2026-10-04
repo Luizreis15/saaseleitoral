@@ -79,8 +79,38 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Senha obrigatória"),
 });
 
+export const createPresenceLinkSchema = z.object({
+  member_id: z.string().uuid("Integrante inválido"),
+  location_id: z.string().uuid("Local inválido"),
+  duration_hours: z.coerce.number().min(1, "Mínimo 1 hora").max(24, "Máximo 24 horas").default(4),
+  ping_interval_sec: z.coerce.number().int().min(15).max(300).default(45),
+  send_whatsapp: z.boolean().optional().default(false),
+});
+
+export const presenceVerifySchema = z.object({
+  token: z.string().min(16, "Link inválido"),
+  phone: z.string().min(10, "Informe o telefone cadastrado"),
+  otp: z.string().regex(/^\d{6}$/, "Código deve ter 6 dígitos"),
+  consent: z.literal(true, {
+    errorMap: () => ({ message: "É necessário autorizar o uso da localização" }),
+  }),
+});
+
+export const presencePingSchema = z.object({
+  session_token: z.string().min(16, "Sessão inválida"),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+  accuracy_m: z.number().min(0).max(50000).nullable().optional(),
+  client_ts: z.string().datetime().optional(),
+});
+
+export const presenceEndSchema = z.object({
+  session_token: z.string().min(16, "Sessão inválida"),
+});
+
 export type MemberInput = z.infer<typeof memberSchema>;
 export type CoordinatorInput = z.infer<typeof coordinatorSchema>;
 export type LocationInput = z.infer<typeof locationSchema>;
 export type AssignmentInput = z.infer<typeof assignmentSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type CreatePresenceLinkInput = z.infer<typeof createPresenceLinkSchema>;

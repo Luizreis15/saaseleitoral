@@ -8,6 +8,7 @@ export const MASTER_NAV = [
   { href: "/integrantes", label: "Integrantes" },
   { href: "/locais", label: "Locais" },
   { href: "/mapa", label: "Mapa" },
+  { href: "/presenca", label: "Presença" },
   { href: "/pagamentos", label: "Pagamentos" },
   { href: "/pendencias", label: "Pendências" },
   { href: "/auditoria", label: "Auditoria" },
@@ -19,6 +20,7 @@ export const COORDINATOR_NAV = [
   { href: "/minha-equipe/integrantes", label: "Minha equipe" },
   { href: "/minha-equipe/distribuicao", label: "Distribuição" },
   { href: "/minha-equipe/locais", label: "Locais" },
+  { href: "/presenca", label: "Presença" },
   { href: "/pagamentos", label: "Pagamentos" },
   { href: "/configuracoes", label: "Minha conta" },
 ] as const;
