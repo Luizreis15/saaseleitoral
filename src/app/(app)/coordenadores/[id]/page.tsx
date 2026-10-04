@@ -75,7 +75,7 @@ export default async function CoordinatorDetailPage({
         <span>{maskCpf(coordinator.cpf)}</span>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         <StatCard label="Equipe" value={team?.name ?? "—"} />
         <StatCard label="Pessoas" value={members?.length ?? 0} />
         <StatCard label="Valor por integrante" value={formatCurrency(team?.default_payment_amount ?? 0)} />
@@ -86,7 +86,7 @@ export default async function CoordinatorDetailPage({
         <StatCard label="Escolas" value={schools ?? 0} />
       </div>
 
-      <div className="mt-8 overflow-x-auto rounded-xl border bg-card shadow-sm">
+      <div className="data-list mt-8 overflow-x-auto rounded-xl border bg-card shadow-sm">
         <table className="min-w-full text-sm">
           <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
@@ -99,14 +99,14 @@ export default async function CoordinatorDetailPage({
           <tbody>
             {(members ?? []).map((m) => (
               <tr key={m.id} className="border-t">
-                <td className="px-4 py-3">
+                <td className="px-4 py-3" data-label="Integrante">
                   <Link href={`/integrantes/${m.id}`} className="font-medium text-primary hover:underline">
                     {m.full_name}
                   </Link>
                 </td>
-                <td className="px-4 py-3">{maskCpf(m.cpf)}</td>
-                <td className="px-4 py-3">{formatPhone(m.phone ?? "")}</td>
-                <td className="px-4 py-3">
+                <td className="px-4 py-3" data-label="CPF">{maskCpf(m.cpf)}</td>
+                <td className="px-4 py-3" data-label="Telefone">{formatPhone(m.phone ?? "")}</td>
+                <td className="px-4 py-3" data-label="Status">
                   <StatusBadge active={m.active} />
                 </td>
               </tr>

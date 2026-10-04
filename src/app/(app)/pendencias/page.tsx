@@ -50,7 +50,7 @@ export default async function PendenciasPage({
     <div>
       <TopBar title="Pendências" description="Central de atenção operacional" />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         <Link href="/pendencias?type=missing_location">
           <StatCard
             label="Sem escola"
@@ -82,7 +82,7 @@ export default async function PendenciasPage({
       </div>
 
       {type ? (
-        <div className="mt-8 overflow-x-auto rounded-xl border bg-card shadow-sm">
+        <div className="data-list mt-8 overflow-x-auto rounded-xl border bg-card shadow-sm">
           <table className="min-w-full text-sm">
             <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
@@ -96,13 +96,13 @@ export default async function PendenciasPage({
                 const team = Array.isArray(m.op_teams) ? m.op_teams[0] : m.op_teams;
                 return (
                   <tr key={m.id} className="border-t">
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3" data-label="Integrante">
                       <Link href={`/integrantes/${m.id}`} className="text-primary hover:underline">
                         {m.full_name}
                       </Link>
                     </td>
-                    <td className="px-4 py-3">{maskCpf(m.cpf)}</td>
-                    <td className="px-4 py-3">{team?.name ?? "—"}</td>
+                    <td className="px-4 py-3" data-label="CPF">{maskCpf(m.cpf)}</td>
+                    <td className="px-4 py-3" data-label="Equipe">{team?.name ?? "—"}</td>
                   </tr>
                 );
               })}

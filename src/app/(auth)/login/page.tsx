@@ -38,9 +38,9 @@ export default function LoginPage() {
         <div className="absolute -right-16 bottom-10 h-80 w-80 rounded-full bg-sky-400/10 blur-3xl" />
       </div>
 
-      <div className="relative w-full max-w-md rounded-2xl border bg-white/95 p-8 shadow-lg animate-fade-up">
+      <div className="relative w-full max-w-md rounded-2xl border bg-white/95 p-6 shadow-lg animate-fade-up sm:p-8">
         <div className="mb-8 text-center">
-          <p className="text-2xl font-semibold tracking-tight text-primary">Digital Era</p>
+          <p className="text-2xl font-semibold tracking-tight text-primary">Digital Hera</p>
           <h1 className="mt-2 text-lg font-medium text-foreground">Gestão Operacional</h1>
           <p className="mt-1 text-sm text-muted-foreground">Acesse com seu e-mail e senha</p>
         </div>

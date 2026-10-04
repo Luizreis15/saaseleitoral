@@ -57,6 +57,10 @@
   border-color: var(--border);
 }
 
+html {
+  overflow-x: clip;
+}
+
 body {
   background:
     radial-gradient(1200px 600px at 10% -10%, rgba(29, 78, 216, 0.08), transparent 60%),
@@ -64,7 +68,58 @@ body {
     var(--background);
   color: var(--foreground);
   font-family: var(--font-plus-jakarta), "Segoe UI", sans-serif;
-  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: clip;
+}
+
+@media (max-width: 767px) {
+  .data-list {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .data-list table,
+  .data-list tbody,
+  .data-list tr,
+  .data-list td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .data-list thead {
+    display: none;
+  }
+
+  .data-list tr {
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 0.875rem;
+    background: white;
+    padding: 0.25rem 0;
+  }
+
+  .data-list td {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.55rem 0.875rem;
+    text-align: right;
+  }
+
+  .data-list td::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    color: var(--muted-foreground);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-align: left;
+    text-transform: uppercase;
+  }
 }
 
 @keyframes fade-up {

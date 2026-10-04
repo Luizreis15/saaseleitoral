@@ -89,7 +89,7 @@ export default async function CoordinatorsPage() {
           }
         />
       ) : (
-        <div className="overflow-x-auto rounded-xl border bg-card shadow-sm">
+        <div className="data-list overflow-x-auto rounded-xl border bg-card shadow-sm">
           <table className="min-w-full text-sm">
             <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
@@ -104,17 +104,17 @@ export default async function CoordinatorsPage() {
             <tbody>
               {rows.map((row) => (
                 <tr key={row.id} className="border-t hover:bg-accent/40">
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3" data-label="Coordenador">
                     <Link href={`/coordenadores/${row.id}`} className="font-medium text-primary hover:underline">
                       {row.full_name}
                     </Link>
                     <p className="text-xs text-muted-foreground">{maskCpf(row.cpf)}</p>
                   </td>
-                  <td className="px-4 py-3">{row.teamName}</td>
-                  <td className="px-4 py-3 tabular-nums">{row.people}</td>
-                  <td className="px-4 py-3 tabular-nums">{row.schools}</td>
-                  <td className="px-4 py-3 tabular-nums">{row.withoutLocation}</td>
-                  <td className="px-4 py-3 tabular-nums">{formatCurrency(row.cost)}</td>
+                  <td className="px-4 py-3" data-label="Equipe">{row.teamName}</td>
+                  <td className="px-4 py-3 tabular-nums" data-label="Pessoas">{row.people}</td>
+                  <td className="px-4 py-3 tabular-nums" data-label="Escolas">{row.schools}</td>
+                  <td className="px-4 py-3 tabular-nums" data-label="Sem local">{row.withoutLocation}</td>
+                  <td className="px-4 py-3 tabular-nums" data-label="Custo">{formatCurrency(row.cost)}</td>
                 </tr>
               ))}
             </tbody>

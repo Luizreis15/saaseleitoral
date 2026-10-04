@@ -21,18 +21,20 @@ export function GlobalSearchInput({ defaultValue = "" }: { defaultValue?: string
   }
 
   return (
-    <form onSubmit={submit} className="flex w-full max-w-xl gap-2">
-      <div className="relative flex-1">
+    <form onSubmit={submit} className="flex w-full min-w-0 gap-2">
+      <div className="relative min-w-0 flex-1">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Buscar pessoa, CPF, coordenador ou escola..."
-          className="pl-9"
+          placeholder="Buscar pessoa, CPF ou escola"
+          className="h-11 min-w-0 pl-9"
+          enterKeyHint="search"
         />
       </div>
-      <Button type="submit" disabled={pending || !q.trim()}>
-        Buscar
+      <Button type="submit" className="h-11 shrink-0 px-3" disabled={pending || !q.trim()} aria-label="Buscar">
+        <Search className="h-4 w-4 md:hidden" />
+        <span className="hidden md:inline">Buscar</span>
       </Button>
     </form>
   );

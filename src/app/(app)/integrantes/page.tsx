@@ -90,9 +90,9 @@ export default async function MembersPage({
           name="q"
           defaultValue={sp.q ?? ""}
           placeholder="Nome, CPF ou telefone"
-          className="h-10 rounded-md border border-input bg-background px-3 text-sm lg:col-span-2"
+          className="h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-base lg:col-span-2"
         />
-        <select name="team" defaultValue={sp.team ?? ""} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
+        <select name="team" defaultValue={sp.team ?? ""} className="h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-base">
           <option value="">Equipe</option>
           {(teams ?? []).map((t) => (
             <option key={t.id} value={t.id}>
@@ -100,7 +100,7 @@ export default async function MembersPage({
             </option>
           ))}
         </select>
-        <select name="city" defaultValue={sp.city ?? ""} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
+        <select name="city" defaultValue={sp.city ?? ""} className="h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-base">
           <option value="">Cidade</option>
           {(cities ?? []).map((c) => (
             <option key={c.id} value={c.id}>
@@ -108,12 +108,12 @@ export default async function MembersPage({
             </option>
           ))}
         </select>
-        <select name="status" defaultValue={sp.status ?? ""} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
+        <select name="status" defaultValue={sp.status ?? ""} className="h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-base">
           <option value="">Status</option>
           <option value="active">Ativo</option>
           <option value="inactive">Inativo</option>
         </select>
-        <select name="location" defaultValue={sp.location ?? ""} className="h-10 rounded-md border border-input bg-background px-3 text-sm">
+        <select name="location" defaultValue={sp.location ?? ""} className="h-11 w-full min-w-0 rounded-md border border-input bg-background px-3 text-base">
           <option value="">Local</option>
           <option value="assigned">Com local</option>
           <option value="missing">Sem local</option>
@@ -127,7 +127,7 @@ export default async function MembersPage({
         <EmptyState title="Nenhum integrante encontrado" description="Ajuste a busca ou cadastre um novo integrante." />
       ) : (
         <>
-          <div className="overflow-x-auto rounded-xl border bg-card shadow-sm">
+          <div className="data-list overflow-x-auto rounded-xl border bg-card shadow-sm">
             <table className="min-w-full text-sm">
               <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
                 <tr>
@@ -145,16 +145,16 @@ export default async function MembersPage({
                   const city = Array.isArray(m.op_cities) ? m.op_cities[0] : m.op_cities;
                   return (
                     <tr key={m.id} className="border-t hover:bg-accent/40">
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3" data-label="Nome">
                         <Link href={`/integrantes/${m.id}`} className="font-medium text-primary hover:underline">
                           {m.full_name}
                         </Link>
                       </td>
-                      <td className="px-4 py-3">{maskCpf(m.cpf)}</td>
-                      <td className="px-4 py-3">{team?.name ?? "—"}</td>
-                      <td className="px-4 py-3">{city?.name ?? "—"}</td>
-                      <td className="px-4 py-3">{formatPhone(m.phone ?? "")}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3" data-label="CPF">{maskCpf(m.cpf)}</td>
+                      <td className="px-4 py-3" data-label="Equipe">{team?.name ?? "—"}</td>
+                      <td className="px-4 py-3" data-label="Cidade">{city?.name ?? "—"}</td>
+                      <td className="px-4 py-3" data-label="Telefone">{formatPhone(m.phone ?? "")}</td>
+                      <td className="px-4 py-3" data-label="Status">
                         <StatusBadge active={m.active} />
                       </td>
                     </tr>

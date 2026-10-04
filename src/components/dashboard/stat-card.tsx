@@ -23,12 +23,12 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "rounded-xl border bg-card p-4 shadow-sm transition-transform duration-300 hover:-translate-y-0.5",
+        "rounded-xl border bg-card p-4 shadow-sm md:transition-transform md:duration-300 md:hover:-translate-y-0.5",
         toneClass
       )}
     >
       <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
-      <p className="mt-2 text-2xl font-semibold text-foreground tabular-nums">{value}</p>
+      <p className="mt-2 text-xl font-semibold leading-tight text-foreground tabular-nums sm:text-2xl">{value}</p>
       {hint ? <p className="mt-1 text-xs text-muted-foreground">{hint}</p> : null}
     </div>
   );

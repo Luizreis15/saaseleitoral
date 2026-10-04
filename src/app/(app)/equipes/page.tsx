@@ -18,7 +18,7 @@ export default async function TeamsPage() {
   return (
     <div>
       <TopBar title="Equipes" description="Equipes vinculadas aos coordenadores" />
-      <div className="overflow-x-auto rounded-xl border bg-card shadow-sm">
+      <div className="data-list overflow-x-auto rounded-xl border bg-card shadow-sm">
         <table className="min-w-full text-sm">
           <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
@@ -35,12 +35,12 @@ export default async function TeamsPage() {
                 : team.op_coordinators;
               return (
                 <tr key={team.id} className="border-t">
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3" data-label="Equipe">
                     <Link href={`/equipes/${team.id}`} className="font-medium text-primary hover:underline">
                       {team.name}
                     </Link>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3" data-label="Coordenador">
                     {coordinator ? (
                       <Link href={`/coordenadores/${coordinator.id}`} className="hover:underline">
                         {coordinator.full_name}
@@ -49,8 +49,8 @@ export default async function TeamsPage() {
                       "—"
                     )}
                   </td>
-                  <td className="px-4 py-3">{formatCurrency(team.default_payment_amount)}</td>
-                  <td className="px-4 py-3">{team.active ? "Ativa" : "Inativa"}</td>
+                  <td className="px-4 py-3" data-label="Valor padrão">{formatCurrency(team.default_payment_amount)}</td>
+                  <td className="px-4 py-3" data-label="Status">{team.active ? "Ativa" : "Inativa"}</td>
                 </tr>
               );
             })}

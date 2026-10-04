@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
@@ -10,8 +10,21 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Digital Era — Gestão Operacional",
+  title: "Digital Hera — Gestão Operacional",
   description: "Plataforma interna de gestão operacional de equipes",
+  applicationName: "Digital Hera",
+  appleWebApp: {
+    capable: true,
+    title: "Digital Hera",
+    statusBarStyle: "default",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#1d4ed8",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
