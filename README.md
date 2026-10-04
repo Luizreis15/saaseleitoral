@@ -51,17 +51,18 @@ Resumo:
 11. Every schema change requires a migration.
 12. Sensitive actions must create audit logs.
 
-## Presença (V1)
+## Presença (V1 + Fase 2)
 
 Fluxo operacional:
 
 1. No detalhe do integrante, gere um **link de presença** (escola + validade)
-2. Envie o link + código de 6 dígitos pelo WhatsApp
+2. Envie pelo **WhatsApp** (API Evolution/Meta se configurada, ou atalho `wa.me`)
 3. O integrante abre `/p/[token]`, confirma telefone e autoriza GPS
 4. Enquanto a sessão estiver aberta, o app registra se ele está dentro do raio da escola
-5. Acompanhe em **Presença** (`/presenca`)
+5. Acompanhe ao vivo em **Presença** (`/presenca`) com mapa, realtime e relatório de tempo
 
-Requer a migration `20261004120000_presence_links.sql` e `SUPABASE_SERVICE_ROLE_KEY` no servidor.
+Migrations: `20261004120000_presence_links.sql` + `20261004140000_presence_phase2.sql`  
+Requer `SUPABASE_SERVICE_ROLE_KEY` no servidor. WhatsApp opcional via env (ver `.env.example`).
 
 ## Rotas
 

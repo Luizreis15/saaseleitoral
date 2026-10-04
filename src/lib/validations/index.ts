@@ -84,6 +84,7 @@ export const createPresenceLinkSchema = z.object({
   location_id: z.string().uuid("Local inválido"),
   duration_hours: z.coerce.number().min(1, "Mínimo 1 hora").max(24, "Máximo 24 horas").default(4),
   ping_interval_sec: z.coerce.number().int().min(15).max(300).default(45),
+  send_whatsapp: z.boolean().optional().default(false),
 });
 
 export const presenceVerifySchema = z.object({

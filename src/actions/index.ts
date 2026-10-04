@@ -20,6 +20,11 @@ import {
   generatePresenceToken,
   hashSecret,
 } from "@/lib/presence";
+import {
+  buildPresenceWhatsAppMessage,
+  buildWhatsAppShareUrl,
+  sendPresenceWhatsApp,
+} from "@/lib/whatsapp";
 import { headers } from "next/headers";
 
 type ActionResult<T = unknown> = { ok: true; data?: T } | { ok: false; error: string };
@@ -516,9 +521,20 @@ async function resolveAppOrigin(): Promise<string> {
   return "http://localhost:3000";
 }
 
-export async function createPresenceLinkAction(
-  input: unknown
-): Promise<ActionResult<{ url: string; otp: string; expires_at: string; id: string }>> {
+export async function createPresenceLinkAction(input: unknown): Promise<
+  ActionResult<{
+    id: string;
+    url: string;
+    otp: string;
+    expires_at: string;
+    whatsapp_share_url: string;
+    whatsapp_sent: boolean;
+    whatsapp_channel: string | null;
+    whatsapp_error: string | null;
+    member_phone: string;
+    location_name: string;
+  }>
+> {
   try {
     const session = await requireUser(["master", "coordinator"]);
     const data = createPresenceLinkSchema.parse(input);
@@ -526,15 +542,16 @@ export async function createPresenceLinkAction(
 
     const { data: member, error: memberError } = await supabase
       .from("op_members")
-      .select("id, team_id, phone, full_name, active")
+      .select("id, team_id, phone, whatsapp, full_name, active")
       .eq("id", data.member_id)
       .maybeSingle();
     if (memberError) throw memberError;
     if (!member || !member.active) {
       return { ok: false, error: "Integrante não encontrado ou inativo." };
     }
-    if (!member.phone || onlyDigits(member.phone).length < 10) {
-      return { ok: false, error: "Integrante sem telefone cadastrado." };
+    const phone = member.whatsapp || member.phone;
+    if (!phone || onlyDigits(phone).length < 10) {
+      return { ok: false, error: "Integrante sem telefone/WhatsApp cadastrado." };
     }
 
     const { data: location, error: locationError } = await supabase
@@ -590,14 +607,55 @@ export async function createPresenceLinkAction(
 
     if (error) return { ok: false, error: friendlyError(error) };
 
+    const origin = await resolveAppOrigin();
+    const url = buildPresenceUrl(origin, token);
+    const firstName = member.full_name.trim().split(/\s+/)[0] ?? "Integrante";
+    const message = buildPresenceWhatsAppMessage({
+      memberFirstName: firstName,
+      locationName: location.name,
+      url,
+      otp,
+      expiresAt: link.expires_at,
+    });
+    const shareUrl = buildWhatsAppShareUrl(phone, message);
+
+    let whatsappSent = false;
+    let whatsappChannel: string | null = "wa_me";
+    let whatsappError: string | null = null;
+    let whatsappTo: string | null = null;
+
+    if (data.send_whatsapp) {
+      const sent = await sendPresenceWhatsApp({ phone, message });
+      if (sent.ok) {
+        whatsappSent = true;
+        whatsappChannel = sent.channel;
+        whatsappTo = sent.to;
+      } else {
+        whatsappChannel = sent.channel;
+        whatsappTo = sent.to;
+        whatsappError = sent.error;
+      }
+
+      await supabase
+        .from("op_presence_links")
+        .update({
+          whatsapp_to: whatsappTo,
+          whatsapp_sent_at: whatsappSent ? new Date().toISOString() : null,
+          whatsapp_channel: whatsappChannel,
+          whatsapp_error: whatsappError,
+        })
+        .eq("id", link.id);
+    }
+
     await writeAudit("PRESENCE_LINK_CREATED", "presence_link", link.id, {
       member_id: member.id,
       location_id: location.id,
       expires_at: expiresAt,
       duration_hours: data.duration_hours,
+      whatsapp_sent: whatsappSent,
+      whatsapp_channel: whatsappChannel,
     });
 
-    const origin = await resolveAppOrigin();
     revalidatePath("/presenca");
     revalidatePath(`/integrantes/${member.id}`);
 
@@ -605,9 +663,15 @@ export async function createPresenceLinkAction(
       ok: true,
       data: {
         id: link.id,
-        url: buildPresenceUrl(origin, token),
+        url,
         otp,
         expires_at: link.expires_at,
+        whatsapp_share_url: shareUrl,
+        whatsapp_sent: whatsappSent,
+        whatsapp_channel: whatsappChannel,
+        whatsapp_error: whatsappError,
+        member_phone: phone,
+        location_name: location.name,
       },
     };
   } catch (error) {

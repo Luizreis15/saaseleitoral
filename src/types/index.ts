@@ -148,8 +148,25 @@ export interface OpPresenceLink {
   otp_hash: string;
   otp_hint: string | null;
   status: OpPresenceLinkStatus;
+  whatsapp_to: string | null;
+  whatsapp_sent_at: string | null;
+  whatsapp_channel: string | null;
+  whatsapp_error: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface OpPresenceReport {
+  session_id?: string;
+  inside_seconds: number;
+  outside_seconds: number;
+  uncertain_seconds: number;
+  unknown_seconds: number;
+  tracked_seconds: number;
+  ping_count: number;
+  inside_ratio: number;
+  first_ping_at: string | null;
+  last_ping_at: string | null;
 }
 
 export interface OpPresenceSession {

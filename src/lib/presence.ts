@@ -96,3 +96,9 @@ export function geoStatusLabel(status: OpPresenceGeoStatus): string {
       return "Aguardando";
   }
 }
+
+export function isPresenceStale(lastPingAt: string | null | undefined, pingIntervalSec = 45): boolean {
+  if (!lastPingAt) return true;
+  const staleMs = Math.max(pingIntervalSec * 3, 90) * 1000;
+  return Date.now() - new Date(lastPingAt).getTime() > staleMs;
+}

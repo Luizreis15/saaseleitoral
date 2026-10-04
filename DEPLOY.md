@@ -78,6 +78,7 @@ Cole **nessa ordem** o conteúdo de cada arquivo e rode (Run):
 4. `supabase/migrations/20261002140300_gestao_operacional_seed_cities.sql`
 5. `supabase/migrations/20261004030000_provision_coordinator.sql`
 6. `supabase/migrations/20261004120000_presence_links.sql`
+7. `supabase/migrations/20261004140000_presence_phase2.sql`
 
 ### Auth (Settings → Authentication)
 
@@ -121,7 +122,20 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
 NEXT_PUBLIC_APP_URL=https://SEU-DOMINIO.vercel.app
 NEXT_PUBLIC_MAPS_API_KEY=   # opcional
+
+# WhatsApp opcional (Evolution OU Meta)
+WHATSAPP_EVOLUTION_URL=
+WHATSAPP_EVOLUTION_API_KEY=
+WHATSAPP_EVOLUTION_INSTANCE=
+WHATSAPP_META_TOKEN=
+WHATSAPP_META_PHONE_NUMBER_ID=
 ```
+
+### WhatsApp — como funciona
+
+1. Sem API configurada: o botão **Abrir WhatsApp** usa `wa.me` com a mensagem pronta
+2. Com **Evolution API**: envio server-side automático ao gerar o link
+3. Com **Meta Cloud API**: envio server-side (texto livre; templates oficiais podem ser exigidos pela Meta em produção)
 
 6. **Deploy**
 7. Volte no Supabase e atualize Site URL / Redirect URLs com a URL da Vercel

@@ -8,6 +8,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { OpLocation } from "@/types";
 
+type CreateResult = {
+  url: string;
+  otp: string;
+  expires_at: string;
+  whatsapp_share_url: string;
+  whatsapp_sent: boolean;
+  whatsapp_channel: string | null;
+  whatsapp_error: string | null;
+  location_name: string;
+};
+
 export function CreatePresenceLinkForm({
   memberId,
   memberName,
@@ -22,9 +33,8 @@ export function CreatePresenceLinkForm({
   const [pending, startTransition] = useTransition();
   const [locationId, setLocationId] = useState(defaultLocationId ?? locations[0]?.id ?? "");
   const [durationHours, setDurationHours] = useState("4");
-  const [result, setResult] = useState<{ url: string; otp: string; expires_at: string } | null>(
-    null
-  );
+  const [sendWhatsapp, setSendWhatsapp] = useState(true);
+  const [result, setResult] = useState<CreateResult | null>(null);
 
   const usableLocations = locations.filter((l) => l.latitude != null && l.longitude != null);
 
@@ -40,17 +50,31 @@ export function CreatePresenceLinkForm({
         member_id: memberId,
         location_id: locationId,
         duration_hours: Number(durationHours),
+        send_whatsapp: sendWhatsapp,
       });
       if (!res.ok || !res.data) {
         toast.error(!res.ok ? res.error : "Falha ao gerar link");
         return;
       }
+
       setResult({
         url: res.data.url,
         otp: res.data.otp,
         expires_at: res.data.expires_at,
+        whatsapp_share_url: res.data.whatsapp_share_url,
+        whatsapp_sent: res.data.whatsapp_sent,
+        whatsapp_channel: res.data.whatsapp_channel,
+        whatsapp_error: res.data.whatsapp_error,
+        location_name: res.data.location_name,
       });
-      toast.success("Link de presença gerado");
+
+      if (res.data.whatsapp_sent) {
+        toast.success("Link gerado e enviado no WhatsApp");
+      } else if (sendWhatsapp) {
+        toast.success("Link gerado — use o botão WhatsApp para enviar");
+      } else {
+        toast.success("Link de presença gerado");
+      }
     });
   }
 
@@ -110,6 +134,17 @@ export function CreatePresenceLinkForm({
             required
           />
         </div>
+        <label className="flex items-start gap-2 text-sm text-muted-foreground">
+          <input
+            type="checkbox"
+            className="mt-1"
+            checked={sendWhatsapp}
+            onChange={(e) => setSendWhatsapp(e.target.checked)}
+          />
+          <span>
+            Enviar pelo WhatsApp (API Evolution/Meta se configurada; senão abre atalho wa.me)
+          </span>
+        </label>
         <Button type="submit" disabled={pending} className="w-full sm:w-auto">
           {pending ? "Gerando..." : "Gerar link"}
         </Button>
@@ -131,7 +166,7 @@ export function CreatePresenceLinkForm({
             </Button>
           </div>
           <div>
-            <p className="text-xs uppercase text-muted-foreground">Código (envie junto no WhatsApp)</p>
+            <p className="text-xs uppercase text-muted-foreground">Código</p>
             <p className="text-2xl font-semibold tracking-widest">{result.otp}</p>
             <Button
               type="button"
@@ -144,22 +179,36 @@ export function CreatePresenceLinkForm({
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            Expira em {new Date(result.expires_at).toLocaleString("pt-BR")}. O código só é mostrado
-            agora.
+            {result.location_name} · expira{" "}
+            {new Date(result.expires_at).toLocaleString("pt-BR")}
           </p>
-          <Button
-            type="button"
-            variant="secondary"
-            className="w-full"
-            onClick={() =>
-              void copy(
-                `Digital Hera — presença\n${result.url}\nCódigo: ${result.otp}`,
-                "Mensagem"
-              )
-            }
-          >
-            Copiar mensagem completa
-          </Button>
+          {result.whatsapp_sent ? (
+            <p className="text-xs text-emerald-700">
+              Mensagem enviada via {result.whatsapp_channel}.
+            </p>
+          ) : result.whatsapp_error ? (
+            <p className="text-xs text-amber-700">{result.whatsapp_error}</p>
+          ) : null}
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Button type="button" asChild className="w-full">
+              <a href={result.whatsapp_share_url} target="_blank" rel="noreferrer">
+                Abrir WhatsApp
+              </a>
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              className="w-full"
+              onClick={() =>
+                void copy(
+                  `Digital Hera — presença\n${result.url}\nCódigo: ${result.otp}`,
+                  "Mensagem"
+                )
+              }
+            >
+              Copiar mensagem
+            </Button>
+          </div>
         </div>
       ) : null}
     </div>
